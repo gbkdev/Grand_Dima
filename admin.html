@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Grand Dima Hotel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+<div id="loadingScreen" class="loading-screen">Loading admin panel...</div>
+
+<section id="loginScreen" class="admin-login hidden">
+  <div class="admin-login-card">
+    <div class="admin-login-brand">
+      <div class="logo-text">
+        <span class="logo-grand">GRAND</span>
+        <span class="logo-dima" style="color:var(--navy)">DIMA</span>
+        <span class="logo-hotel">HOTEL</span>
+      </div>
+      <p>Manager Portal — sign in to manage bookings, rooms, and guests.</p>
+    </div>
+    <div id="loginError" class="admin-login-error"></div>
+    <form id="loginForm" class="admin-login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="manager@granddima.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="btn btn-gold full-width">Sign In</button>
+    </form>
+    <p style="text-align:center;margin-top:1.25rem;font-size:0.8125rem;color:var(--text-light)">
+      <a href="index.html" style="color:var(--gold)">← Back to website</a>
+    </p>
+  </div>
+</section>
+
+<div id="adminApp" class="admin-app hidden">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-brand">
+      <a href="index.html">
+        <span class="logo-ornament">✦</span>
+        <div class="logo-text">
+          <span class="logo-grand">GRAND</span>
+          <span class="logo-dima">DIMA</span>
+        </div>
+      </a>
+      <small>Management Console</small>
+    </div>
+    <nav class="admin-nav" id="adminNav">
+      <button class="admin-nav-item active" data-page="overview">📊 Overview</button>
+      <button class="admin-nav-item" data-page="bookings">📋 Bookings</button>
+      <button class="admin-nav-item" data-page="restaurant">🍽 Restaurant</button>
+      <button class="admin-nav-item" data-page="messages">✉️ Messages <span class="admin-nav-badge hidden" id="unreadBadge">0</span></button>
+      <button class="admin-nav-item" data-page="newsletter">📬 Newsletter</button>
+      <button class="admin-nav-item" data-page="room-types">🏨 Room Types</button>
+      <button class="admin-nav-item" data-page="room-units">🛏 Room Units</button>
+      <button class="admin-nav-item" data-page="menu">📖 Menu Items</button>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <div class="admin-user">
+        <div class="admin-user-avatar" id="userAvatar">GD</div>
+        <div>
+          <strong id="userName">Manager</strong>
+          <span id="userRole">Staff</span>
+        </div>
+      </div>
+      <button class="btn btn-outline-light full-width" id="logoutBtn" style="border-color:rgba(255,255,255,0.25);color:#fff;width:100%;justify-content:center">Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <h1 id="pageTitle">Dashboard Overview</h1>
+      <div class="admin-topbar-actions">
+        <button class="btn btn-ghost small" id="refreshBtn">Refresh</button>
+        <a href="index.html" class="btn btn-navy small">View Website</a>
+      </div>
+    </header>
+
+    <div class="admin-content-wrap">
+      <section class="admin-page-panel active" id="page-overview">
+        <div class="admin-kpis" id="overviewKpis"></div>
+        <div class="admin-grid-2">
+          <div class="admin-card">
+            <h3>Recent Bookings</h3>
+            <div class="recent-list" id="recentBookings"></div>
+          </div>
+          <div class="admin-card">
+            <h3>Bookings This Week</h3>
+            <div class="chart-bars" id="weeklyChart"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-bookings">
+        <div class="admin-toolbar">
+          <input type="text" id="bookingSearch" placeholder="Search guest, email, reference...">
+          <select id="bookingStatusFilter">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="completed">Completed</option>
+          </select>
+          <button class="btn btn-gold small" id="addBookingBtn">+ New Booking</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Reference</th><th>Guest</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Total</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-restaurant">
+        <div class="admin-toolbar">
+          <input type="text" id="restaurantSearch" placeholder="Search guest or restaurant...">
+          <select id="restaurantStatusFilter">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Guest</th><th>Restaurant</th><th>Date</th><th>Time</th><th>Guests</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="restaurantTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-messages">
+        <div class="admin-toolbar">
+          <input type="text" id="messageSearch" placeholder="Search messages...">
+          <select id="messageReadFilter">
+            <option value="">All</option>
+            <option value="unread">Unread</option>
+            <option value="read">Read</option>
+          </select>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="messagesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-newsletter">
+        <div class="admin-toolbar">
+          <input type="text" id="newsletterSearch" placeholder="Search email...">
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Email</th><th>Subscribed</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="newsletterTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-room-types">
+        <div class="admin-toolbar">
+          <button class="btn btn-gold small" id="addRoomTypeBtn">+ Add Room Type</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th><th>Price</th><th>Size</th><th>Guests</th><th>Badge</th><th>Active</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roomTypesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-page-panel" id="page-room-units">
+        <div class="admin-toolbar">
+          <select id="roomUnitTypeFilter"><option value="">All Types</option></select>
+          <select id="roomUnitStatusFilter">
+            <option value="">All Status</option>
+            <option value="available">Available</option>
+            <option value="occupied">Occupied</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="cleaning">Cleaning</option>
+          </select>
+          <button class="btn btn-gold small" id="addRoomUnitBtn">+ Add Room Unit</button>
+        </div>
+        <div class="rooms-admin-grid" id="roomUnitsGrid"></div>
+      </section>
+
+      <section class="admin-page-panel" id="page-menu">
+        <div class="admin-toolbar">
+          <select id="menuRestaurantFilter"><option value="">All Restaurants</option></select>
+          <button class="btn btn-gold small" id="addMenuItemBtn">+ Add Menu Item</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Item</th><th>Category</th><th>Restaurant</th><th>Price</th><th>Active</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="menuTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="admin-modal" id="adminModal">
+  <div class="admin-modal-box" id="adminModalBox">
+    <button class="admin-modal-close" id="adminModalClose">✕</button>
+    <h2 id="adminModalTitle">Edit</h2>
+    <form id="adminModalForm"></form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
